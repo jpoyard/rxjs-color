@@ -1,6 +1,6 @@
 import { Color } from './color.interface';
 import { ColorsMap } from './colors.data';
-import { of, Observable } from 'rxjs';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
 
 interface ActiveColor {
   index: number;
@@ -8,17 +8,15 @@ interface ActiveColor {
 }
 
 export class ColorsList {
-  private colors: Observable<Color[]>;
+  private colors = new BehaviorSubject<Color[]>([]);
   private active: ActiveColor = { color: null, index: null };
+  private color$ = new Subject<Color>();
 
   constructor(
     private ulElement: HTMLUListElement,
     private colorsMap: Map<string, Color>
   ) {
-    this.colors = new Observable<Color[]>(observer => {
-      observer.next(Array.from(this.colorsMap.values()));
-      observer.complete();
-    });
+    this.colors.next(Array.from(this.colorsMap.values()));
   }
 
   /**
@@ -69,7 +67,9 @@ export class ColorsList {
       };
       this.ulElement.appendChild(li);
     });
-    liActiveColor.scrollIntoView();
+    if (liActiveColor) {
+      liActiveColor.scrollIntoView();
+    }
   }
 
   /**
@@ -77,21 +77,19 @@ export class ColorsList {
    * @param term
    */
   public filter(term: string) {
-    this.colors = new Observable<Color[]>(observer => {
-      observer.next(
-        Array.from(ColorsMap.values()).filter((color: Color) =>
-          color.name.toLocaleLowerCase().includes(term)
-        )
-      );
-      observer.complete();
-    });
+    this.colors.next(
+      Array.from(ColorsMap.values()).filter((color: Color) =>
+        color.name.toLocaleLowerCase().includes(term)
+      )
+    );
   }
 
   /**
-   * Call when color change
-   * @param color
+   * notify when color changed
    */
-  public onColorChange(color: Color) {}
+  public get color(): Observable<Color> {
+    return this.color$.asObservable();
+  }
 
   /**
    * Define selected color
@@ -105,7 +103,7 @@ export class ColorsList {
     this.active.color.active = true;
     this.colors.subscribe(colors => this.update(colors));
 
-    this.onColorChange(this.active.color);
+    this.color$.next(this.active.color);
   }
 
   /**

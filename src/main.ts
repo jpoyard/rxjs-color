@@ -20,11 +20,11 @@ const lightenDarkenElement = new LightenDarkenElement(
   document.querySelector('.lighten-darken')
 );
 
-colorsList.onColorChange = (color: Color) => {
+colorsList.color.subscribe((color: Color) => {
   colorElement.update(color);
   colorSimpleELement.update(color);
   lightenDarkenElement.update(color);
-};
+});
 
 document.onkeydown = (event: KeyboardEvent) => {
   if (event.code === 'ArrowUp') {
