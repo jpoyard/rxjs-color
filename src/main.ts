@@ -1,9 +1,8 @@
+import { ColorElement } from './color-element.class';
+import { ColorSimpleElement } from './color-simple-element.class';
 import { Color } from './color.interface';
 import { ColorsList } from './colors-list.class';
 import { ColorsMap } from './colors.data';
-import { lightenDarkenColor, revertColor } from './tools.function';
-import { ColorElement } from './color-element.class';
-import { ColorSimpleElement } from './color-simple-element.class';
 import { LightenDarkenElement } from './lighten-darken-element.class';
 
 const colorsList = new ColorsList(
