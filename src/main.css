@@ -1,0 +1,18 @@
+.grid-container {
+  height: 100vh;
+  display: grid;
+  grid-row-end: span 2;
+  grid-template-columns: repeat(3, auto);
+}
+.lighten-darken {
+  grid-row-end: span 2;
+  display: grid;
+  grid-template-rows: repeat(20, auto);
+}
+.select-color {
+  grid-row-end: span 2;
+  overflow: auto;
+}
+.select-color .list-group {
+  overflow: auto;
+}
