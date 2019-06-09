@@ -1,3 +1,5 @@
+import { fromEvent } from 'rxjs';
+
 import { ColorElement } from './color-element.class';
 import { ColorSimpleElement } from './color-simple-element.class';
 import { Color } from './color.interface';
@@ -34,11 +36,13 @@ document.onkeydown = (event: KeyboardEvent) => {
 
 const inputFilter: HTMLInputElement = document.querySelector('#inputFilter');
 let term: string = '';
-inputFilter.onkeyup = () => {
-  if (term !== inputFilter.value.toLocaleLowerCase()) {
-    term = inputFilter.value.toLocaleLowerCase();
+
+fromEvent(inputFilter, 'input').subscribe(event => {
+  const eventTerm = (event.target as HTMLInputElement).value.toLocaleLowerCase();
+  if (term !== eventTerm) {
+    term = eventTerm;
     colorsList.filter(term);
   }
-};
+});
 
 colorsList.init();
