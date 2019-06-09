@@ -1,5 +1,5 @@
 import { fromEvent } from 'rxjs';
-
+import { map, tap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ColorElement } from './color-element.class';
 import { ColorSimpleElement } from './color-simple-element.class';
 import { Color } from './color.interface';
@@ -35,14 +35,14 @@ document.onkeydown = (event: KeyboardEvent) => {
 };
 
 const inputFilter: HTMLInputElement = document.querySelector('#inputFilter');
-let term: string = '';
 
-fromEvent(inputFilter, 'input').subscribe(event => {
-  const eventTerm = (event.target as HTMLInputElement).value.toLocaleLowerCase();
-  if (term !== eventTerm) {
-    term = eventTerm;
-    colorsList.filter(term);
-  }
-});
+fromEvent(inputFilter, 'input')
+  .pipe(
+    map(event => (event.target as HTMLInputElement).value.toLocaleLowerCase()),
+    debounceTime(300),
+    distinctUntilChanged(),
+    tap(console.info)
+  )
+  .subscribe(term => colorsList.filter(term));
 
 colorsList.init();
