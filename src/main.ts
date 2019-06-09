@@ -1,5 +1,4 @@
 import { fromEvent } from 'rxjs';
-
 import { ColorElement } from './color-element.class';
 import { ColorSimpleElement } from './color-simple-element.class';
 import { Color } from './color.interface';
