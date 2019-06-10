@@ -16,10 +16,16 @@ export class LightenDarkenElement {
           color.value,
           amt
         ).toUpperCase();
-        sampleElt.style.backgroundColor = lightenDarkenColorValue;
-        sampleElt.style.color = revertColor(lightenDarkenColorValue);
-        sampleElt.classList.add('d-flex', 'flex-row', 'justify-content-around');
-        sampleElt.innerHTML = `<i>${amt.toString()}</i><i>${lightenDarkenColorValue}</i>`;
+        if (lightenDarkenColorValue.length === 7) {
+          sampleElt.style.backgroundColor = lightenDarkenColorValue;
+          sampleElt.style.color = revertColor(lightenDarkenColorValue);
+          sampleElt.classList.add(
+            'd-flex',
+            'flex-row',
+            'justify-content-around'
+          );
+          sampleElt.innerHTML = `<i>${amt.toString()}</i><i>${lightenDarkenColorValue}</i>`;
+        }
         this.element.appendChild(sampleElt);
       });
   }
