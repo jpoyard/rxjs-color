@@ -84,8 +84,8 @@ export class ColorsList {
       this.colors = colors.filter((color: Color) =>
         color.name.toLocaleLowerCase().includes(term)
       );
+      this.update(this.colors);
     });
-    this.update(this.colors);
   }
 
   /**
