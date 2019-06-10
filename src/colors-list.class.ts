@@ -1,4 +1,5 @@
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { BehaviorSubject, from, fromEvent, Observable, Subject } from 'rxjs';
+import { filter, takeUntil, toArray } from 'rxjs/operators';
 import { Color } from './color.interface';
 
 interface ActiveColor {
@@ -7,7 +8,7 @@ interface ActiveColor {
 }
 
 export class ColorsList {
-  private source: Observable<Color[]>;
+  private source: Observable<Color>;
   private colors = new BehaviorSubject<Color[]>([]);
   private active: ActiveColor = { color: null, index: null };
   private color$ = new Subject<Color>();
@@ -16,8 +17,8 @@ export class ColorsList {
     private ulElement: HTMLUListElement,
     private colorsMap: Map<string, Color>
   ) {
-    this.source = of(Array.from(this.colorsMap.values()));
-    this.source.subscribe(colors => this.colors.next(colors));
+    this.source = from(Array.from(this.colorsMap.values()));
+    this.filter(null);
   }
 
   /**
@@ -63,11 +64,10 @@ export class ColorsList {
         liActiveColor = li;
       }
       li.innerHTML = color.name;
-      li.onclick = () => {
-        this.setColor(color);
-      };
+      li.onclick = () => this.setColor(color);
       this.ulElement.appendChild(li);
     });
+
     if (liActiveColor) {
       liActiveColor.scrollIntoView();
     }
@@ -78,13 +78,15 @@ export class ColorsList {
    * @param term
    */
   public filter(term: string) {
-    this.source.subscribe(colors => {
-      this.colors.next(
-        colors.filter((color: Color) =>
-          color.name.toLocaleLowerCase().includes(term)
-        )
-      );
-    });
+    this.source
+      .pipe(
+        filter(
+          (color: Color) =>
+            !term || color.name.toLocaleLowerCase().includes(term)
+        ),
+        toArray()
+      )
+      .subscribe(colors => this.colors.next(colors));
   }
 
   /**
