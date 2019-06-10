@@ -64,12 +64,14 @@ export class ColorsList {
         liActiveColor = li;
       }
       li.innerHTML = color.name;
-      li.onclick = () => this.setColor(color);
+      fromEvent(li, 'click')
+        .pipe(takeUntil(this.color))
+        .subscribe(() => this.setColor(color));
       this.ulElement.appendChild(li);
     });
 
     if (liActiveColor) {
-      liActiveColor.scrollIntoView();
+      liActiveColor.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
@@ -80,10 +82,7 @@ export class ColorsList {
   public filter(term: string) {
     this.source
       .pipe(
-        filter(
-          (color: Color) =>
-            !term || color.name.toLocaleLowerCase().includes(term)
-        ),
+        filter(color => !term || color.name.toLocaleLowerCase().includes(term)),
         toArray()
       )
       .subscribe(colors => this.colors.next(colors));
@@ -107,9 +106,9 @@ export class ColorsList {
     this.active.color = color;
     this.active.color.active = true;
 
-    this.colors.subscribe(colors => this.update(colors));
-
     this.color$.next(this.active.color);
+
+    this.colors.subscribe(colors => this.update(colors));
   }
 
   /**

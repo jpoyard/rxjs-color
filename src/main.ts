@@ -1,5 +1,5 @@
 import { fromEvent } from 'rxjs';
-import { map, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { ColorElement } from './color-element.class';
 import { ColorSimpleElement } from './color-simple-element.class';
 import { Color } from './color.interface';
