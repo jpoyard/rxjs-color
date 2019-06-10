@@ -71,7 +71,9 @@ export class ColorsList {
       };
       this.ulElement.appendChild(li);
     });
-    liActiveColor.scrollIntoView();
+    if (liActiveColor) {
+      liActiveColor.scrollIntoView();
+    }
   }
 
   /**
