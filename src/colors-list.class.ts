@@ -93,9 +93,9 @@ export class ColorsList {
     }
     this.active.color = color;
     this.active.color.active = true;
-    this.update();
 
     this.onColorChange(this.active.color);
+    this.update();
   }
 
   /**
