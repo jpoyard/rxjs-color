@@ -1,6 +1,6 @@
+import { Observable } from 'rxjs';
 import { Color } from './color.interface';
 import { ColorsMap } from './colors.data';
-import { of, Observable } from 'rxjs';
 
 interface ActiveColor {
   index: number;
@@ -8,30 +8,32 @@ interface ActiveColor {
 }
 
 export class ColorsList {
-  private colors: Observable<Color[]>;
+  private source: Observable<Color[]>;
+  private colors: Color[];
   private active: ActiveColor = { color: null, index: null };
 
   constructor(
     private ulElement: HTMLUListElement,
     private colorsMap: Map<string, Color>
   ) {
-    this.colors = new Observable<Color[]>(observer => {
+    this.source = new Observable<Color[]>(observer => {
       observer.next(Array.from(this.colorsMap.values()));
       observer.complete();
     });
+    this.source.subscribe(colors => (this.colors = colors));
   }
 
   /**
    * initialize component
    */
   public init() {
-    this.colors.subscribe(colors => {
-      if (colors && colors.length > 0) {
-        this.setColor(colors[0]);
-      } else {
-        this.update(colors);
-      }
-    });
+    const colors = this.colors;
+
+    if (colors && colors.length > 0) {
+      this.setColor(colors[0]);
+    } else {
+      this.update(colors);
+    }
   }
 
   /**
@@ -39,14 +41,14 @@ export class ColorsList {
    * @param index
    */
   private setColorByIndex(index: number) {
-    this.colors.subscribe(colors => {
-      try {
-        const color = colors[index];
-        if (color) {
-          this.setColor(color);
-        }
-      } catch (e) {}
-    });
+    const colors = this.colors;
+
+    try {
+      const color = colors[index];
+      if (color) {
+        this.setColor(color);
+      }
+    } catch (e) {}
   }
 
   /**
@@ -77,13 +79,11 @@ export class ColorsList {
    * @param term
    */
   public filter(term: string) {
-    this.colors = new Observable<Color[]>(observer => {
-      observer.next(
-        Array.from(ColorsMap.values()).filter((color: Color) =>
-          color.name.toLocaleLowerCase().includes(term)
-        )
+    this.source.subscribe(colors => {
+      this.colors = Array.from(ColorsMap.values()).filter((color: Color) =>
+        color.name.toLocaleLowerCase().includes(term)
       );
-      observer.complete();
+      this.update(this.colors);
     });
   }
 
@@ -103,7 +103,7 @@ export class ColorsList {
     }
     this.active.color = color;
     this.active.color.active = true;
-    this.colors.subscribe(colors => this.update(colors));
+    this.update(this.colors);
 
     this.onColorChange(this.active.color);
   }
