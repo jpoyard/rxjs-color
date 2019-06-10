@@ -1,6 +1,5 @@
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { Color } from './color.interface';
-import { ColorsMap } from './colors.data';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
 
 interface ActiveColor {
   index: number;
@@ -8,6 +7,7 @@ interface ActiveColor {
 }
 
 export class ColorsList {
+  private source: Observable<Color[]>;
   private colors = new BehaviorSubject<Color[]>([]);
   private active: ActiveColor = { color: null, index: null };
   private color$ = new Subject<Color>();
@@ -16,7 +16,8 @@ export class ColorsList {
     private ulElement: HTMLUListElement,
     private colorsMap: Map<string, Color>
   ) {
-    this.colors.next(Array.from(this.colorsMap.values()));
+    this.source = of(Array.from(this.colorsMap.values()));
+    this.source.subscribe(colors => this.colors.next(colors));
   }
 
   /**
@@ -77,11 +78,13 @@ export class ColorsList {
    * @param term
    */
   public filter(term: string) {
-    this.colors.next(
-      Array.from(ColorsMap.values()).filter((color: Color) =>
-        color.name.toLocaleLowerCase().includes(term)
-      )
-    );
+    this.source.subscribe(colors => {
+      this.colors.next(
+        colors.filter((color: Color) =>
+          color.name.toLocaleLowerCase().includes(term)
+        )
+      );
+    });
   }
 
   /**
@@ -101,6 +104,7 @@ export class ColorsList {
     }
     this.active.color = color;
     this.active.color.active = true;
+
     this.colors.subscribe(colors => this.update(colors));
 
     this.color$.next(this.active.color);
